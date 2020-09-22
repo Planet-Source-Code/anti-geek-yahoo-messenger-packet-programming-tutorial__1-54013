@@ -1,0 +1,852 @@
+{\rtf1\ansi\ansicpg1252\deff0\deflang1033{\fonttbl{\f0\fswiss\fcharset0 Arial;}}
+{\colortbl ;\red0\green128\blue0;\red255\green0\blue0;\red0\green255\blue255;\red0\green0\blue255;\red128\green128\blue128;\red0\green0\blue128;\red0\green0\blue0;\red128\green0\blue0;}
+{\*\generator Msftedit 5.41.15.1503;}\viewkind4\uc1\pard\qc\b\f0\fs24 Ok this is like my third tutorial on Packet programming .\par
+By Eric Internetprogramer also known as internetchatid\b0\fs20\par
+\pard\cf1  (Want to Beable to make a 'Bot' for chats .? want to simply make a program to Grab your buddy list? or recv your pm's while your not at home. if so This tutorial you just been waiting and looking for , this tutorial will go in depth on How to\cf0\ul  Read Raw packets , understanding the packet Understanding how to send the packets to a server without Erroring \cf1  \cf0 , learn how to Create Packets from Raw hex packets \cf1\ulnone  )\par
+\cf0\par
+\par
+\pard\qc\cf2\ul\b ok if you read this tutorial before and the packets was errorin on ya . the look at the new Csizehex it has been fixed due to the fact when i rote this i never tryed any packets out ..  now in this update read all of it . if you understand packets how to make them and dont understand how to grab your buddy list begin at STEP 7A\cf0\ulnone\b0\par
+\pard\par
+\par
+\cf2\ul STEP 1\ulnone  :\cf0\par
+\b ok lets start by getting to know a few functions this will help you in your day to day packet coding\cf3\b0  \cf1 ( some people like this method because it is very fast and reliable )\par
+\par
+\pard\qc\cf4 Public Function HextoAscii(inputstr As String) As String\par
+\cf5 Dim spilter As Variant, i As Integer, finnal As String\par
+If InStr(1, inputstr, " ") <> 0 Then\par
+spilter = Split(inputstr, " ")\par
+For i = 0 To UBound(spilter)\par
+finnal = finnal & Chr(Val("&H" & spilter(i)))\par
+Next i\par
+HextoAscii = finnal\par
+ElseIf Len(inputstr) = 2 Then\par
+finnal = Chr(Val("&H" & inputstr))\par
+HextoAscii = finnal\par
+End If\cf4\par
+End Function\par
+\cf3\par
+\cf4 Public Function Asciitohex(inputstr As String) As String\par
+\cf5 On Error Resume Next\par
+Dim spilter As Variant, i As Integer, finnal As String\par
+For i = 1 To Len(inputstr)\par
+finnal = finnal & Hex(Asc(Mid(inputstr, i, 1))) & " "\par
+Next i\par
+Asciitohex = Mid(finnal, 1, Len(finnal) - 1)\cf4\par
+End Function\par
+\pard\cf0\par
+These 2 functions are Great for Really Fast Packet coding . copy them and put them ina module file . then save this module anywhere you want as long you will always remember where it is saved even when you drunk so as stoned i am at times. but lets get to know a few simple methods that comes with VB, if you dont like these functions or method of coding . in example 1 then use the functions along with example 2\par
+\pard\qc\par
+         Example 1:\par
+\cf6 ok lets say we see the hex FF \par
+ok now what your probly asking . now lets say we want to Change FF to a charater so we can see it insted of looking at FF \par
+\par
+\cf5 debug.print chr(&H\cf6 FF\cf5 )\cf1  ' < this will change FF into \'ff\cf6\par
+\par
+now lets say we got a Letter we wanna trun into a hex lets use the letter Y\par
+\par
+\cf5 debug.print hex(asc("\cf6 Y\cf5 ")) \cf1 ' < This will change Y into 59 \cf6\par
+\cf0\par
+Now lets do this again but with more bytes \par
+\par
+\cf6 ok lets say we see the hex 45 72 69 63\par
+ok now what your probly asking . now lets say we want to Change 45 72 69 63 to charaters so we can see it insted of looking at 45 72 69 63\par
+   \par
+\cf5 debug.print chr(&H\cf6 45\cf5 )\cf1  \cf6 & \cf5 chr(&H\cf6 72\cf5 )\cf1  \cf6 & \cf5 chr(&H\cf6 69\cf5 )\cf1  \cf6 & \cf5 chr(&H\cf6 63)\cf1 ' < this will change \cf6 45 72 69 63 \cf1  into Eric\cf6\par
+\cf0\par
+\cf6 now lets say we got a string we wanna trun into a hex lets use the letter Eric\cf0\par
+Debug.Print Hex(Asc("E")) & " " & Hex(Asc("r")) & " " & Hex(Asc("i")) & " " & Hex(Asc("c")) \cf5  \cf1 ' < This will change Eric into  \cf6 45 72 69 63 \cf1  \cf0\par
+\par
+     End of Example 1 \par
+\par
+\pard Those 2 are complicated to remember you might say well remember the 2 functions i told you to save .  load that into a blank Standard Exe project\par
+now you should see Form1 and The module you just Added \par
+\pard\qc\par
+          Example 2\par
+Now lets do the Same as in Example 1: but using are functions \par
+\cf6 ok lets say we see the hex FF \par
+ok now what your probly asking . now lets say we want to Change FF to a charater so we can see it insted of looking at FF \cf0\par
+\cf5 debug.print hextoascii("FF")\cf1  ' < this will change FF into \'ff\cf6\par
+\par
+now lets say we got a Letter we wanna trun into a hex lets use the letter Y\par
+\par
+\cf5 debug.print asciitohex("Y") \cf1 ' < This will change Y into 59 \cf0\par
+\par
+Now lets do this again but with more bytes \par
+\par
+\cf6 ok lets say we see the hex 45 72 69 63\par
+ok now what your probly asking . now lets say we want to Change 45 72 69 63 to charaters so we can see it insted of looking at 45 72 69 63\par
+   \par
+\cf5 debug.print hextoascii("\cf6 45 72 69 63\cf5 ")\cf6  \cf1 ' < this will change \cf6 45 72 69 63 \cf1  into Eric\cf6\par
+\cf0\par
+\cf6 now lets say we got a string we wanna trun into a hex lets use the letter Eric\cf0\par
+Debug.Print AsciitoHex("Eric") \cf5  \cf1 ' < This will change Eric into  \cf6 45 72 69 63 \cf1  \cf0\par
+\par
+     End of Example 2 \par
+\pard\par
+Step 1 Conclusion : i hope you now got a lil bit more understanding on how to Convert hex to ascii and ascii to hex these are Vital for Packet programming\par
+\par
+\par
+\par
+\par
+\cf2\ul STEP 2\ulnone :\cf0\par
+ok now  lets say we got 2 packet monitor . in these case i will use Wpe pro alpha . and commview 3.2 \cf1 ( there are MANY diffrent Packet monitor it all depeneds on which Operating system you are on . and which one you simply love to work with )\par
+\par
+\par
+\pard\qc\par
+Example 1 \cf0 Wpe pro alpha\cf1\par
+\par
+\cf7 1  172.209.173.64  216.155.193.183  151  Send\cf1   \par
+0000 \cf7  59 4D 53 47 00 0B 00 00 00 83 00 A9 00 00 00 00   \cf8  YMSG............\par
+\cf1 0010\cf8   \cf7 D8 66 31 A0 31 C0 80 69 6E 74 65 72 6E 65 74 70 \cf8    .f1.1..internetp\par
+\cf1 0020  \cf7 72 6F 67 72 61 6D 65 72 C0 80 31 32 38 C0 80 31\cf1   \cf8   rogramer..128..1\par
+\cf1 0030  \cf7 36 30 30 30 34 37 37 35 34 C0 80 31 30 34 C0 80\cf1    \cf8  600047754..104..\par
+\cf1 0040  \cf7 69 6E 74 65 72 6E 65 74 70 72 6F 67 72 61 6D 65\cf1    \cf8  internetprograme\par
+\cf1 0050  \cf7 72 27 73 20 72 6F 6F 6D C0 80 31 32 39 C0 80 31\cf1   \cf8   r's room..129..1\par
+\cf1 0060  \cf7 36 30 30 30 34 37 37 35 34 C0 80 31 30 35 C0 80\cf1    \cf8  600047754..105..\cf1\par
+   0070  \cf7 57 65 6C 63 6F 6D 65 20 74 6F 20 4D 79 20 52 6F\cf1   \cf8   Welcome to My Ro\par
+\cf1 0080  \cf7 6F 6D C0 80 31 32 36 C0 80 36 35 35 33 36 C0 80\cf1    \cf8  om..126..65536..\par
+\cf1 0090  \cf7 36 32 C0 80 32 C0 80\cf1                            \cf8     62..2..\par
+\cf1\par
+\cf7\par
+ok now see 0000 to 0090 take that off .  that is pure 100% bullshit  that is just like a line count\cf1  (really those only there for 1 line count and 2 trail versions so you cant view big packets)\par
+\par
+\cf7 ok now that you removed the 0000 to 0090 you should only have this \cf1\par
+\par
+\cf7 1  172.209.173.64  216.155.193.183  151  Send\cf1   \par
+\cf7  59 4D 53 47 00 0B 00 00 00 83 00 A9 00 00 00 00   \cf8  YMSG............\par
+\cf7 D8 66 31 A0 31 C0 80 69 6E 74 65 72 6E 65 74 70 \cf8    .f1.1..internetp\par
+\cf7 72 6F 67 72 61 6D 65 72 C0 80 31 32 38 C0 80 31\cf1   \cf8   rogramer..128..1\par
+\cf7 36 30 30 30 34 37 37 35 34 C0 80 31 30 34 C0 80\cf1    \cf8  600047754..104..\par
+\cf7 69 6E 74 65 72 6E 65 74 70 72 6F 67 72 61 6D 65\cf1    \cf8  internetprograme\par
+\cf7 72 27 73 20 72 6F 6F 6D C0 80 31 32 39 C0 80 31\cf1   \cf8   r's room..129..1\par
+\cf7 36 30 30 30 34 37 37 35 34 C0 80 31 30 35 C0 80\cf1    \cf8  600047754..105..\cf1\par
+\cf7     57 65 6C 63 6F 6D 65 20 74 6F 20 4D 79 20 52 6F\cf1   \cf8   Welcome to My Ro\par
+\cf1  \cf7 6F 6D C0 80 31 32 36 C0 80 36 35 35 33 36 C0 80\cf1    \cf8  om..126..65536..\par
+\cf1  \cf7 36 32 C0 80 32 C0 80\cf1                            \cf8     62..2..\cf1\par
+\par
+\par
+\par
+\cf7 now . we all know yahoo headers start with YMSG or YCHT for java so lets explain a lil bit about yahoo packets you probly dint understand before.\par
+\cf8\par
+YMSG.............f1.1..internetprogramer..128..1600047754..104..internetprogramer's room..129..1600047754..105..Welcome to My Room..126..65536..62..2..\par
+\par
+YMSG.............f1.\cf1  '< This is the header of the packet , the header is always 20 bytes for yahoo messenger packets . and 16 for YCHT\cf8\par
+\par
+1..internetprogramer..128..1600047754..104..internetprogramer's room..129..1600047754..105..Welcome to My Room..126..65536..62..2..\cf1  '< this is the buffer \par
+\par
+\cf7 ok in the buffer see  1.. , 1.. is in byte 21 so that means it the buffer \cf8\par
+\par
+1\'c0\'80the spot where you place the bots name\'c0\'80\par
+128\'c0\'80the Room Space\'c0\'80\par
+104\'c0\'80hereis the roomname your making\'c0\'80\par
+129\'c0\'80is also room space\'c0\'80\par
+105\'c0\'80 is the message everyone sees when they enter Roomname(\'c0\'80105\'c0\'80 message here)\'c0\'80\par
+126\'c0\'80sub command . this tells the server ok we are making a room with voice . it is public and no invites are needed . this varys as you select diffrent options\'c0\'80\par
+62\'c0\'801 or 2 this is telling the server to make your bot have a webcam picture next to it name or not\'c0\'80\par
+\cf1\par
+\par
+\cf7 i hope you now learned where the header is located and here the buffer is located\cf1\par
+\par
+\par
+End Example 1 \cf0 Wpe pro alpha\cf1\par
+\par
+\par
+Example 2 \cf0 commview 3.2 \cf1\par
+\par
+0x0000   \cf7 1A 8C 20 00 01 00 00 00-01 00 00 00 08 00 45 00 \cf8   .\'8c ...........E.\par
+\cf1 0x0010   \cf7 00 BF 01 92 40 00 80 06-8E CD AC 86 23 10 D8 9B\cf1   \cf8  .\'bf.\rquote @.\'80.\'8e\'cd\'ac\'86#.\'d8\'9b\par
+\pard\qc\tx6480\cf1 0x0020   \cf7 C1 A7 04 13 13 BA BF 55-61 37 CF D2 DB E1 50 18  \cf8  \'c1\'a7...\'ba\'bfUa7\'cf\'d2\'db\'e1P.\par
+\pard\qc\cf1 0x0030   \cf7 44 E5 0D EC 00 00 59 4D-53 47 00 0B 00 00 00 83   \cf8 D\'e5.\'ec..YMSG.....\'83\par
+\cf1 0x0040  \cf7  00 A9 00 00 00 00 BE 74-33 CC 31 C0 80 69 6E 74 \cf8   .\'a9....\'bet3\'cc1\'c0\'80int\par
+\cf1 0x0050   \cf7 65 72 6E 65 74 70 72 6F-67 72 61 6D 65 72 C0 80\cf1    \cf8 ernetprogramer\'c0\'80\par
+\cf1 0x0060   \cf7 31 32 38 C0 80 31 36 30-30 30 34 37 37 35 34 C0\cf1    \cf8 128\'c0\'801600047754\'c0\par
+\cf1 0x0070   \cf7 80 31 30 34 C0 80 69 6E-74 65 72 6E 65 74 70 72\cf1   \cf8  \'80104\'c0\'80internetpr\cf1\par
+0x0080   \cf7 6F 67 72 61 6D 65 72 27-73 20 72 6F 6F 6D C0 80\cf1   \cf8  ogramer's room\'c0\'80\par
+\cf1 0x0090   \cf7 31 32 39 C0 80 31 36 30-30 30 34 37 37 35 34 C0   \cf8 129\'c0\'801600047754\'c0\par
+\cf1 0x00A0   \cf7 80 31 30 35 C0 80 57 65-6C 63 6F 6D 65 20 74 6F   \cf8\'80105\'c0\'80Welcome to\par
+\cf1 0x00B0   \cf7 20 4D 79 20 52 6F 6F 6D-C0 80 31 32 36 C0 80 36   \cf8  My Room\'c0\'80126\'c0\'806\cf1\par
+0x00C0   \cf7 35 35 33 36 C0 80 36 32-C0 80 32 C0 80            \cf8 5536\'c0\'8062\'c0\'802\'c0\'80\par
+\cf1\par
+\par
+\cf7\par
+ok now see 0x0000 to 0x00C0 take that off .  that is pure 100% bullshit  that is just like a line count\cf1  (really those only there for 1 line count and 2 trail versions so you cant view big packets)\par
+\par
+\cf7 ok now that you removed the0x0000 to 0x00C0 you should only have this \cf1\par
+\par
+\cf7 1A 8C 20 00 01 00 00 00-01 00 00 00 08 00 45 00 \cf8   .\'8c ...........E.\par
+\cf1  \cf7 00 BF 01 92 40 00 80 06-8E CD AC 86 23 10 D8 9B\cf1   \cf8  .\'bf.\rquote @.\'80.\'8e\'cd\'ac\'86#.\'d8\'9b\par
+\pard\qc\tx6480\cf7 C1 A7 04 13 13 BA BF 55-61 37 CF D2 DB E1 50 18  \cf8  \'c1\'a7...\'ba\'bfUa7\'cf\'d2\'db\'e1P.\par
+\pard\qc\cf7 44 E5 0D EC 00 00 59 4D-53 47 00 0B 00 00 00 83   \cf8 D\'e5.\'ec..YMSG.....\'83\par
+\cf7  00 A9 00 00 00 00 BE 74-33 CC 31 C0 80 69 6E 74 \cf8   .\'a9....\'bet3\'cc1\'c0\'80int\par
+\cf1  \cf7 65 72 6E 65 74 70 72 6F-67 72 61 6D 65 72 C0 80\cf1    \cf8 ernetprogramer\'c0\'80\par
+\cf7 31 32 38 C0 80 31 36 30-30 30 34 37 37 35 34 C0\cf1    \cf8 128\'c0\'801600047754\'c0\par
+\cf7 80 31 30 34 C0 80 69 6E-74 65 72 6E 65 74 70 72\cf1   \cf8  \'80104\'c0\'80internetpr\cf1\par
+\cf7 6F 67 72 61 6D 65 72 27-73 20 72 6F 6F 6D C0 80\cf1   \cf8  ogramer's room\'c0\'80\par
+\cf7 31 32 39 C0 80 31 36 30-30 30 34 37 37 35 34 C0   \cf8 129\'c0\'801600047754\'c0\par
+\cf7 80 31 30 35 C0 80 57 65-6C 63 6F 6D 65 20 74 6F   \cf8\'80105\'c0\'80Welcome to\par
+\cf7 20 4D 79 20 52 6F 6F 6D-C0 80 31 32 36 C0 80 36   \cf8  My Room\'c0\'80126\'c0\'806\cf1\par
+\cf7 35 35 33 36 C0 80 36 32-C0 80 32 C0 80            \cf8 5536\'c0\'8062\'c0\'802\'c0\'80\cf1\par
+\par
+\par
+ok in commview it is kinda whats the word RETARDED! because it shows the Tcp header and Udp Header infront of the packet .\par
+so this means we need to remove that before we can begin making the packet because it is junk so we know YMSG is the Start of are packet so lets remove the shit infront of it  cuz thats the tcp header/udp header\par
+\cf7 1A 8C 20 00 01 00 00 00-01 00 00 00 08 00 45 00 \cf8   .\'8c ...........E.\par
+\cf1  \cf7 00 BF 01 92 40 00 80 06-8E CD AC 86 23 10 D8 9B\cf1   \cf8  .\'bf.\rquote @.\'80.\'8e\'cd\'ac\'86#.\'d8\'9b\par
+\pard\qc\tx6480\cf7 C1 A7 04 13 13 BA BF 55-61 37 CF D2 DB E1 50 18  \cf8  \'c1\'a7...\'ba\'bfUa7\'cf\'d2\'db\'e1P.\par
+\pard\qc\cf7 44 E5 0D EC 00 00 \cf8 D\'e5.\'ec..\cf7\par
+\par
+^ this is the TcpHeader/Udpheader of the packet  \par
+\par
+\par
+v this is the packet this is what we want/need !\par
+\cf8\par
+\cf7 59 4D-53 47 00 0B 00 00 00 83   \cf8 YMSG.....\'83\par
+\cf7  00 A9 00 00 00 00 BE 74-33 CC 31 C0 80 69 6E 74 \cf8   .\'a9....\'bet3\'cc1\'c0\'80int\par
+\cf1  \cf7 65 72 6E 65 74 70 72 6F-67 72 61 6D 65 72 C0 80\cf1    \cf8 ernetprogramer\'c0\'80\par
+\cf7 31 32 38 C0 80 31 36 30-30 30 34 37 37 35 34 C0\cf1    \cf8 128\'c0\'801600047754\'c0\par
+\cf7 80 31 30 34 C0 80 69 6E-74 65 72 6E 65 74 70 72\cf1   \cf8  \'80104\'c0\'80internetpr\cf1\par
+\cf7 6F 67 72 61 6D 65 72 27-73 20 72 6F 6F 6D C0 80\cf1   \cf8  ogramer's room\'c0\'80\par
+\cf7 31 32 39 C0 80 31 36 30-30 30 34 37 37 35 34 C0   \cf8 129\'c0\'801600047754\'c0\par
+\cf7 80 31 30 35 C0 80 57 65-6C 63 6F 6D 65 20 74 6F   \cf8\'80105\'c0\'80Welcome to\par
+\cf7 20 4D 79 20 52 6F 6F 6D-C0 80 31 32 36 C0 80 36   \cf8  My Room\'c0\'80126\'c0\'806\cf1\par
+\cf7 35 35 33 36 C0 80 36 32-C0 80 32 C0 80            \cf8 5536\'c0\'8062\'c0\'802\'c0\'80\cf1\par
+\cf7 now . we all know yahoo headers start with YMSG or YCHT for java so lets explain a lil bit about yahoo packets you probly dint understand before.\par
+\cf8\par
+YMSG.....\'83.\'a9....\'be1\'c0\'80internetprogramer\'c0\'80128\'c0\'801600047754\'c0\'80104\'c0\'80internetprogramer's room\'c0\'80129\'c0\'801600047754\'c0\'80105\'c0\'80Welcome to My Room\'c0\'80126\'c0\'8065536\'c0\'8062\'c0\'802\'c0\'80\par
+\par
+YMSG.....\'83.\'a9....\'bet3\'cc\cf1  '< This is the header of the packet , the header is always 20 bytes for yahoo messenger packets . and 16 for YCHT\cf8\par
+\par
+1\'c0\'80internetprogramer\'c0\'80128\'c0\'801600047754\'c0\'80104\'c0\'80internetprogramer's room\'c0\'80129\'c0\'801600047754\'c0\'80105\'c0\'80Welcome to My Room\'c0\'80126\'c0\'8065536\'c0\'8062\'c0\'802\'c0\'80\cf1  '< this is the buffer \par
+\par
+\cf7 ok in the buffer see  1\cf8\'c0\'80\cf7  , 1\cf8\'c0\'80\cf7  is in byte 21 so that means it the buffer \cf8\par
+\par
+1\'c0\'80the spot where you place the bots name\'c0\'80\par
+128\'c0\'80the Room Space\'c0\'80\par
+104\'c0\'80hereis the roomname your making\'c0\'80\par
+129\'c0\'80is also room space\'c0\'80\par
+105\'c0\'80 is the message everyone sees when they enter Roomname(\'c0\'80105\'c0\'80 message here)\'c0\'80\par
+126\'c0\'80sub command . this tells the server ok we are making a room with voice . it is public and no invites are needed . this varys as you select diffrent options\'c0\'80\par
+62\'c0\'801 or 2 this is telling the server to make your bot have a webcam picture next to it name or not\'c0\'80\par
+\cf1\par
+\par
+\cf7 i hope you now learned where the header is located and here the buffer is located\cf1\par
+\par
+End Example 2 \cf0 commview 3.2 \cf1\par
+\pard\par
+\cf2\ul STEP 3:\cf1\ulnone\par
+\cf0  now Lets get to understand The Header . \par
+in the yahoo messenger protocol . \par
+                                                                           \par
+\cf7 59 4D 53 47 00 0B 00 00 00 83 00 A9 00 00 00 00 D8 66 31 A0 \cf1 < this is the header your are gonna learn from  \cf7\par
+\cf0\par
+\cf7 59 4D 53 47 \cf1 < YMSG header of the packet so yahoo knows what client your sending it from\cf7\par
+00 0B\cf1  <Version Number (protocol Version) \cf7\par
+00 00 \cf1 <Space this just here to make sure your sending the packet right other whise it will disconnect you if you only send 1 space byte insted of 2\cf7\par
+00 83 \cf1 <2 byte buffer len this is the len(size) of the buffer your  going to send\cf7\par
+00\cf1  <Space this is to make the packet bigger i never seen this change but i got a feeling it is used for determining a admin but i not sure untill i see it change\cf7\par
+A9 \cf1 <Command byte this tells the yahoo server ok we are sending a Create room Packet and not a pm or a Add a buddy \cf7\par
+00 00 00 00 \cf1 <Sub Function Bytes.this is here because say you send a pm it sends as 00 00 00 00 but once a P2p connection has been made you send it as  00 00 00 01\par
+\cf7 D8 66 31 A0 \cf1 < YMSgkey\par
+\pard\qc\cf8 YMSG.............f1.\par
+\par
+\cf7 Now i hope this thought you why those bytes are in the header . if you dont understand this tutoiral so far delete vb and kick your pc a few times but dont forget to kick y0 self cuz you stupid enuff now to figure and understand this so far \par
+\par
+now go back to step 1 and read it all over again . read it from step 1 to 3 2 more times so you understand it . \par
+\par
+\pard\cf2\ul STEP 4:\cf0\ulnone\par
+\par
+Now lets Take a look at how the len of the buffer is counted. \par
+once the buffer of your packet reachs 256 the len will look like this 1 0\par
+if it reachs 270 then it will look like this 1 15\par
+if it reachs 512 then it will look like this 2 0\par
+\par
+\par
+Example \par
+\par
+byte 1 tells use ok how many times it reachs 256\par
+ byte 2 is to tell us ok there is so much over that \par
+\par
+lets say are len of are buffer  is 892\par
+ how whould we calulate this\par
+if len over 255 then add 1 to byte 1\par
+do that untill there no more 255 byte left in your total  byte . \par
+if there 124 bytes left then it whould be \cf8 3 124\par
+\cf0\par
+\cf8 59 4D 53 47 00 0B 00 00 00 83\cf7\par
+see \cf8 00 83\cf7  well\cf8  00 \cf7 is byte 1 . and\cf8  83 \cf7 is byte 2\cf0\par
+the YMSG protocol len is ALWAYS LOCATED at byte 9 and 10 \par
+i hope to hell you can understand this . cuz i not gonna site here and explain word for word\par
+\par
+\cf2\ul STEP 5 :\cf0\ulnone\par
+ok now that should understand this . lets finnialy make are Create Room Packet we been explaining. \par
+i will use Commview 3.2 example to explain how to build this Wpepro alpha is the same . \par
+\par
+\par
+\pard\qc\cf7 59 4D-53 47 00 0B 00 00 00 83   \cf8 YMSG.....\'83\par
+\cf7  00 A9 00 00 00 00 BE 74-33 CC 31 C0 80 69 6E 74 \cf8   .\'a9....\'bet3\'cc1\'c0\'80int\par
+\cf1  \cf7 65 72 6E 65 74 70 72 6F-67 72 61 6D 65 72 C0 80\cf1    \cf8 ernetprogramer\'c0\'80\par
+\cf7 31 32 38 C0 80 31 36 30-30 30 34 37 37 35 34 C0\cf1    \cf8 128\'c0\'801600047754\'c0\par
+\cf7 80 31 30 34 C0 80 69 6E-74 65 72 6E 65 74 70 72\cf1   \cf8  \'80104\'c0\'80internetpr\cf1\par
+\cf7 6F 67 72 61 6D 65 72 27-73 20 72 6F 6F 6D C0 80\cf1   \cf8  ogramer's room\'c0\'80\par
+\cf7 31 32 39 C0 80 31 36 30-30 30 34 37 37 35 34 C0   \cf8 129\'c0\'801600047754\'c0\par
+\cf7 80 31 30 35 C0 80 57 65-6C 63 6F 6D 65 20 74 6F   \cf8\'80105\'c0\'80Welcome to\par
+\cf7 20 4D 79 20 52 6F 6F 6D-C0 80 31 32 36 C0 80 36   \cf8  My Room\'c0\'80126\'c0\'806\cf1\par
+\cf7  35 35 33 36 C0 80 36 32-C0 80 32 C0 80            \cf8 5536\'c0\'8062\'c0\'802\'c0\'80\par
+\par
+\par
+\par
+ok now ... see 1\'c0\'80\par
+well in hex 1 is\cf7  31 \cf8 . and \'c0\'80 is \cf7 C0 80\par
+thats where your buffer starts before it is on byte 21 ok so lets build are buffer\par
+\cf0\par
+\pard\cf8 Buffer = "1\'c0\'80internetprogramer\'c0\'80128\'c0\'801600047754\'c0\'80104\'c0\'80internetprogramer's room\'c0\'80129\'c0\'801600047754\'c0\'80105\'c0\'80Welcome to My Room\'c0\'80126\'c0\'8065536\'c0\'8062\'c0\'802\'c0\'80"\par
+\par
+\par
+ok see what we did ....... \cf1  good you should .... so we are left with this now\cf0\par
+\par
+\pard\qc\cf7 59 4D-53 47 00 0B 00 00 00 83   \cf8 YMSG.....\'83\par
+\cf7  00 A9 00 00 00 00 BE 74-33 CC     \cf8 .\'a9....\'bet3\'cc\par
+\par
+\par
+now here the tricky part . this is good to do like above but it alot easyer to use are hextoascii function \par
+\par
+Header = hextoascii("\cf7 59 4D-53 47 00 0B 00 00 00 83 00 A9 00 00 00 00 BE 74-33 CC\cf8 ")\par
+\cf0 now make sure we dont got '  ' dubble spaces in the middle of are hex . like 59  4D = worng thats a dubble space all it does is gonna error are hextoascii\par
+also replace - with spaces . so we got this .\par
+\cf8\b\par
+\b0 Header = hextoascii("\cf7 59 4D 53 47 00 0B 00 00 00 83 00 A9 00 00 00 00 BE 74 33 CC\cf8 ")\cf0\par
+\pard\par
+\pard\qc now this is the tricky part . ok see BE to CC \par
+well thats are YMSG we used for are last session so it no good now . unless you wanna disconnect your own bot by a packet error\par
+so lets remove that ...... now we got this \par
+\pard\par
+\pard\qc\cf8 Header = hextoascii("\cf7 59 4D 53 47 00 0B 00 00 00 83 00 A9 00 00 00 00\cf8 ")\cf0\par
+\pard\par
+Now lets add YKey so we use the right session and dont get disconnected . \par
+\par
+\pard\qc\cf8 Header = hextoascii("\cf7 59 4D 53 47 00 0B 00 00 00 83 00 A9 00 00 00 00\cf8 ") & Ykey \par
+\par
+now lets Add are buffer to are header \par
+\par
+Header = hextoascii("\cf7 59 4D 53 47 00 0B 00 00 00 83 00 A9 00 00 00 00\cf8 ") & Ykey & buffer\cf0\par
+\pard\par
+now we rocking .... ok now .. see byte 00 83 . thats what ?..... are len i hope you got that correct if no pm me telling me you dint get it so i can laff at you \par
+so now we need a function that will calculate are damn buffer size so . remember that module i told you to save those 2 functions . add this . \par
+\par
+\cf4\par
+\pard\qc Public Function cSizeHex(buff As String) As String\par
+\cf5 Dim pcklen As Integer\par
+pcklen = Len(buff)\par
+Dim FstNum As String\par
+FstNum = 0\par
+Do While pcklen > 255\par
+FstNum = FstNum + 1\par
+pcklen = pcklen - 256\par
+Loop\par
+cSizeHex = " " &  Hex(FstNum) & " " & Hex(pcklen) & " "\par
+\cf4 End Function\cf0\par
+\pard\par
+now lets add are Lencounter to are Header . . \par
+\pard\qc\cf8 Header = hextoascii("\cf7 59 4D 53 47 00 0B 00 00" & cSizeHex(buffer) & "00 A9 00 00 00 00\cf8 ") & Ykey & buffer\par
+\par
+understand that !!!! i hope so it easy as 1 2 3 . helll it easyer then the abc's\par
+\par
+\par
+\par
+now lets make this look more like are packet\par
+\par
+\par
+\pard Buffer = "1\'c0\'80internetprogramer\'c0\'80128\'c0\'801600047754\'c0\'80104\'c0\'80internetprogramer's room\'c0\'80129\'c0\'801600047754\'c0\'80105\'c0\'80Welcome to My Room\'c0\'80126\'c0\'8065536\'c0\'8062\'c0\'802\'c0\'80"\par
+\pard\qc Header = hextoascii("\cf7 59 4D 53 47 00 0B 00 00" & cSizeHex(buffer) & "00 A9 00 00 00 00\cf8 ") & Ykey & buffer\par
+\par
+\cf0 now this is the FUN part \par
+making it a function so we can use \par
+\par
+Public Function CreateRoom() as string\par
+End function \par
+\par
+see how that was done . i hope so ... \par
+lets copy are packet into the function \par
+\par
+\par
+Public Function CreateRoom() as string\par
+\pard\cf8 Buffer = "1\'c0\'80internetprogramer\'c0\'80128\'c0\'801600047754\'c0\'80104\'c0\'80internetprogramer's room\'c0\'80129\'c0\'801600047754\'c0\'80105\'c0\'80Welcome to My Room\'c0\'80126\'c0\'8065536\'c0\'8062\'c0\'802\'c0\'80"\par
+\pard\qc Header = hextoascii("\cf7 59 4D 53 47 00 0B 00 00" & cSizeHex(buffer) & "00 A9 00 00 00 00\cf8 ") & Ykey & buffer\par
+\cf0 End function \par
+\pard\par
+\pard\qc\cf7 following me so far if so good . if no Delete this tutorial and give up of programming..\par
+\par
+NOW !!!! lets do the easyest thing about this . \par
+\par
+see \par
+\cf8 Buffer = "1\'c0\'80internetprogramer\'c0\'80128\'c0\'801600047754\'c0\'80104\'c0\'80internetprogramer's room\'c0\'80129\'c0\'801600047754\'c0\'80105\'c0\'80Welcome to My Room\'c0\'80126\'c0\'8065536\'c0\'8062\'c0\'802\'c0\'80"\cf7\par
+now we needa look for all the cretria \par
+1 sender \par
+2 Victim\par
+3 Roomname\par
+4 Room message\par
+\par
+now we know we got 1 , 3 , and 4 \par
+so lets add this to are Buffer string\par
+\cf8 Buffer = "1\'c0\'80" & Sender & "\'c0\'80128\'c0\'801600047754\'c0\'80104\'c0\'80" & Roomname & "\'c0\'80129\'c0\'801600047754\'c0\'80105\'c0\'80" & RoomMessage & "\'c0\'80126\'c0\'8065536\'c0\'8062\'c0\'802\'c0\'80"\cf7\par
+\par
+\par
+\par
+see what we did .  i hope you did . now are function should look like this \par
+\par
+\par
+\par
+\cf0 Public Function CreateRoom() as string\par
+\cf8 Buffer = "1\'c0\'80" & Sender & "\'c0\'80128\'c0\'801600047754\'c0\'80104\'c0\'80" & Roomname & "\'c0\'80129\'c0\'801600047754\'c0\'80105\'c0\'80" & RoomMessage & "\'c0\'80126\'c0\'8065536\'c0\'8062\'c0\'802\'c0\'80"\par
+Header = hextoascii("\cf7 59 4D 53 47 00 0B 00 00" & cSizeHex(buffer) & "00 A9 00 00 00 00\cf8 ") & Ykey & buffer\par
+\cf0 End function \par
+\par
+if your following this your fucking understanding . good . \par
+now lets add are Cretria to are CreateRoom\par
+\par
+\par
+Public Function CreateRoom(\cf8 Sender as string,Roomname as String,Roommessage as string\cf0 ) as string\par
+\cf8 Buffer = "1\'c0\'80" & Sender & "\'c0\'80128\'c0\'801600047754\'c0\'80104\'c0\'80" & Roomname & "\'c0\'80129\'c0\'801600047754\'c0\'80105\'c0\'80" & RoomMessage & "\'c0\'80126\'c0\'8065536\'c0\'8062\'c0\'802\'c0\'80"\par
+Header = hextoascii("\cf7 59 4D 53 47 00 0B 00 00" & cSizeHex(buffer) & "00 A9 00 00 00 00\cf8 ") & Ykey & buffer\par
+\cf0 End function \par
+\par
+\par
+see what we did . if you understand good for you most bytchs like wdf . even after they see what was changed . . . \par
+\par
+\par
+now .. are packet is good to go right ???\par
+\par
+WORNG!!!! we forgot 2 key eliments in are function\par
+\par
+1 We dint Dim Buffer or Header \par
+so lets do this ... now\par
+\par
+Public Function CreateRoom(\cf8 Sender as string,Roomname as String,Roommessage as string\cf0 ) as string\par
+Dim Buffer as string\par
+Dim Header as string\par
+\cf8 Buffer = "1\'c0\'80" & Sender & "\'c0\'80128\'c0\'801600047754\'c0\'80104\'c0\'80" & Roomname & "\'c0\'80129\'c0\'801600047754\'c0\'80105\'c0\'80" & RoomMessage & "\'c0\'80126\'c0\'8065536\'c0\'8062\'c0\'802\'c0\'80"\par
+Header = hextoascii("\cf7 59 4D 53 47 00 0B 00 00" & cSizeHex(buffer) & "00 A9 00 00 00 00\cf8 ") & Ykey & buffer\par
+\cf0 End function \par
+\par
+\par
+also we forgot 1 other Main eliment without this are bot whould send blank packets \par
+\par
+\par
+Public Function CreateRoom(\cf8 Sender as string,Roomname as String,Roommessage as string\cf0 ) as string\par
+Dim Buffer as string\par
+Dim Header as string\par
+\cf8 Buffer = "1\'c0\'80" & Sender & "\'c0\'80128\'c0\'801600047754\'c0\'80104\'c0\'80" & Roomname & "\'c0\'80129\'c0\'801600047754\'c0\'80105\'c0\'80" & RoomMessage & "\'c0\'80126\'c0\'8065536\'c0\'8062\'c0\'802\'c0\'80"\par
+Header = hextoascii("\cf7 59 4D 53 47 00 0B 00 00" & cSizeHex(buffer) & "00 A9 00 00 00 00\cf8 ") & Ykey & buffer\par
+\cf0 CreateRoom = Header\par
+End function \par
+\par
+\par
+see how i added CreateRoom = Header \par
+that tells the function build are packet then send it to are function \par
+so we can call it up like this \par
+winsock.senddata CreateRoom("Mybotname","My Room name:1","This is my room!!!!!!!!!")\par
+\par
+\par
+\par
+ok we are Almost done now . well now we know how to Create packets . \par
+\par
+ok now put your function into a module . \par
+\par
+now how do i call my function you might be asking your self . well \par
+\par
+say you placed it in module named YahPackets\par
+you whould call it by doing this\par
+winsock.senddata YahPackets.\par
+once you hit dot after the module name a list will show up . \par
+use the arrows of your keyborad to go up and down . that list . select the function your want to call  then hit enter\par
+so you should see this now \par
+winsock.senddata YahPackets.CreateRoom\par
+\par
+now what\par
+now add this after (\par
+so it shows up the criteria of are function\par
+winsock.senddata YahPackets.CreateRoom(\par
+a yellow box will show up showing Sender as string , Roomname as string ,RoomMessage as string\par
+so \par
+winsock.senddata YahPackets.CreateRoom("Mybotname","Roombotname","HEllo room users"\par
+now dont forget to close that with ) \par
+other wise you will get a sytax error \par
+\par
+winsock.senddata YahPackets.CreateRoom("Mybotname","Roombotname","HEllo room users")\par
+\par
+\par
+\par
+There now was that so hard or what ... \par
+\par
+\par
+\pard\cf2\ul STEP 6:\par
+\par
+\cf7\ulnone OK Remember Ykey . well are you asking wdf you do with that . well do this . ina module . put this at the top \par
+Public Ykey as string\par
+\par
+\par
+\par
+good . \par
+\par
+\par
+now . goto your winsock_dataarrival . you should understand what i mean\par
+\par
+now . \par
+see how you got \par
+winsock.getdata Data\par
+or sumthing diffrent but it always getdata your string\par
+well right underthat place this \par
+Ykey = Mid(Data,17,4)\par
+\par
+\par
+so it should look like this \par
+winsock.getdata Data\par
+Ykey = Mid(Data,17,4)\par
+\par
+if yours is named Buff insted of Data then do this\par
+winsock.getdata Buff\par
+Ykey = Mid(Buff,17,4)\par
+\par
+\par
+\par
+\cf2\par
+\b\par
+ADDED\par
+\par
+\par
+ok The ykey is always good to use ALL THE TIME!!!!!!!!!!!!!!\par
+in packets before some times without the ykey it will not send the packet \par
+so make sure you always use it \par
+\par
+\par
+ok  ykey is like a kinda username when you login yahoo server they assing you a key so this way they dont needa always look for big names cuz that whould take to long\par
+so they user 4 bytes to commuicate with the user  cuz the ykey on yahoo server is like a profile . it holds all your info like your name \par
+\par
+\par
+other then that this should help i hope ,if no to bad i explained them as much as i can  right now \par
+\b0\par
+\cf7\par
+\par
+\par
+\par
+\par
+\par
+\par
+\par
+\par
+\par
+\cf2\ul STEP 7:\cf7\ulnone\par
+now we convered How to Read Raw packets \par
+, understanding the packet Understanding how to send the packets to a server without Erroring  \par
+, learn how to Create Packets from Raw hex packets\par
+\par
+\par
+we covered it all .!!! \par
+\par
+\par
+\par
+but lets add a lil twist that can help ya out . \par
+ok make your bot join the room now you should have your bot joining the room . \par
+now lets say you want to grab the Voice Authrozation Code \par
+lets introduce you to a other one of my functions . \par
+\par
+\par
+\pard\qc\cf4 Public Function Grabmiddle(recvpacket, Startpos As String, endpos As String) As String\par
+\cf5 On Error Resume Next\par
+Dim pos(5) As Integer\par
+Dim temp(5) As String\par
+If InStr(1, recvpacket, Startpos) <> 0 Then\par
+pos(0) = InStr(1, recvpacket, Startpos) + Len(Startpos)\par
+pos(1) = InStr(pos(0), recvpacket, endpos)\par
+temp(0) = Mid(recvpacket, pos(0), pos(1) - pos(0))\par
+Grabmiddle = temp(0)\par
+End If\cf7\par
+\cf4 End Function\cf7\par
+\pard save that in the module also . \par
+\par
+now .. . .we want to grab the voice auth code\par
+ok i will not explain how to split packets and check which one which and etc...\par
+but the room list and voice auth code is hex 98 \par
+\par
+now if you got your data arrival to notice when you logged in you should know how to do the same for when you join a room \par
+\par
+now lets use a Grabmiddleto Grab the Voice Auth\par
+\par
+\par
+Dim vcauth As String\par
+vcauth = Grabmiddle(Data, "\'c0\'80130\'c0\'80", "\'c0\'80")\par
+\par
+\par
+\par
+thats it you grabbed the voice auth . \par
+\par
+\par
+\par
+\par
+now lets use the same recved packet \par
+but now we wanna grab the room list\par
+\par
+\par
+  Debug.Print Data\par
+    Dim vars As Variant\par
+    vars = Split(Data, "\'c0\'80109\'c0\'80")\par
+    Dim sd As Integer\par
+    For sd = 1 To UBound(vars)\par
+    List1.AddItem Mid(vars(sd), 1, InStr(1, vars(sd), "\'c0\'80110\'c0\'80") - 1)\par
+        Next sd\par
+    \par
+\par
+i hope you understand step 7 cuz i find it easy . you will get better with more work with packets . also work with Mid , instr , split loops . those you should learn no matter what . i whould explain step 7 more but i tired of typing i been typing past fucking 1 and ahalf and i tired of it . \par
+\par
+\cf2\ul\b STEP 7A\par
+\par
+\cf7\ulnone\b0 ok lets look at a Yahoo Messenger Pm RECV packet(not a packet you sent but a packet you recv by someone from your buddy or an enemy) \par
+\par
+\par
+ok heres how are recv looks.\par
+\par
+\pard\qc 12  216.155.193.153  64.10.41.216  113  Recv  \par
+\cf1 0000  \cf7 59 4D 53 47 00 00 00 00 00 5D 00 06 00 00 00 01    \cf8 YMSG.....]......\cf7\par
+\cf1 0010 \cf7  92 66 0D E5 34 C0 80 6B 69 6C 6C 61 6C 62 79 74 \cf8    .f..4..killalbyt\par
+\cf1 0020 \cf7  65 C0 80 31 C0 80 6B 69 6C 6C 61 6C 62 79 74 65 \cf8    e..1..killalbyte\par
+\cf1 0030\cf7   C0 80 35 C0 80 69 6E 74 65 72 6E 65 74 70 72 6F  \cf8   ..5..internetpro\par
+\cf1 0040\cf7   67 72 61 6D 65 72 C0 80 31 34 C0 80 63 6F 6F 6C  \cf8   gramer..14..cool\cf7\par
+\cf1 0050\cf7   C0 80 39 37 C0 80 31 C0 80 36 33 C0 80 3B 30 C0    \cf8 ..97..1..63..;0.\cf7\par
+\cf1 0060\cf7   80 36 34 C0 80 30 C0 80 31 30 30 32 C0 80 31 C0    \cf8 .64..0..1002..1.\cf7\par
+\cf1 0070\cf7   80                                             \cf8     .\par
+\pard\cf7\par
+\pard\qc\cf8\par
+\pard YMSG.....].......f..4..killalbyte..1..killalbyte..5..internetprogramer..14..cool..97..1..63..;0..64..0..1002..1..\par
+\par
+\par
+\cf7 ok since this is a pm what What do we need to know about it .  ok frist of all who sent it to us , 2 the message\par
+\par
+now in this case we want the pm to show up in a textbox right so if someone pms are bots or are clients we know who they are and wdf that blahing about right..\par
+\par
+\par
+ok the person recving this pm is me internetprogramer . the person sending the pm is killalbyte\par
+ and the message he pmed me was cool \par
+\par
+frist off put a textbox on your form\par
+call it Recvpm\par
+second make it so it is Multi line donno wdf i mean . then look in your properties of your textbox you just added . \par
+\par
+now we are set to see are pms \par
+now lets start to split up the code . \cf8\par
+\par
+4..killalbyte..1..killalbyte..5..internetprogramer..14..cool..97..1..63..;0..64..0..1002..1..\par
+\cf7 this is all we need  \par
+\par
+now . when you are recving a packet the person that sent you it is always between \par
+4\'c0\'80personwhosentpm\'c0\'80\par
+or \par
+1\'c0\'80personwhosentpm\'c0\'80\cf8\par
+\cf7 or \cf8\par
+\cf7 0\'c0\'80personwhosentpm\'c0\'80\cf8\par
+so lets start by taking the recved packet and grabbing the senders name . \par
+\cf7 remember that Grabmiddle packet i told you to save before . \par
+well it time to put it to use\par
+\par
+so lets start \par
+\cf4 Dim PmSender as string\par
+PmSender = grabmiddle(Data,"4\'c0\'80","\'c0\'80")\cf7\par
+Wow that was easy you can probly even do that\par
+but see we ran into a other problem\par
+ok frist off before i explain the problem\par
+ok in your winsock data_arrival\par
+do you got it set as \par
+winsock.getdata data \par
+or\par
+winsock.getdata buffer\par
+well \par
+see data in here .V(in the pmsender code)\par
+\cf4 Dim PmSender as string\par
+PmSender = grabmiddle(Data,"4\'c0\'80","\'c0\'80")\par
+\par
+well if your winsock.getdata is not Data but Buffer then change it to this\par
+\par
+Dim PmSender as string\par
+PmSender = grabmiddle(Buffer,"4\'c0\'80","\'c0\'80")\cf7\par
+\par
+ok now the problem with this code\par
+See how we got 4.. and we also got 14..\par
+well grabmiddle is only setup to look for 4.. and as you can see remove the 1 infront of 14 and it also becomes 4.. \par
+so now we got a lil problem \par
+so lets fix this before we do anything\par
+\par
+data = replace(\cf4 Data,"\'c0\'8014\'c0\'80","\'c0\'80666\'c0\'80")\par
+or \par
+\cf7 buffer = replace(\cf4 Buffer,"\'c0\'8014\'c0\'80","\'c0\'80666\'c0\'80")\par
+ok now by doing this are recv packet changed \par
+\cf7 it is not this anymore\par
+\cf8 4..killalbyte..1..killalbyte..5..internetprogramer..14..cool..97..1..63..;0..64..0..1002..1..\cf7\par
+\par
+it now changed to this\par
+\par
+\cf8 4..killalbyte..1..killalbyte..5..internetprogramer..666..cool..97..1..63..;0..64..0..1002..1..\cf7\par
+\par
+now it is perfect and ready \par
+cuz we got rid of are error we whould of normaly encountered\par
+\par
+so now lets make are recvpm work\par
+\cf4 Dim PmSender as string\par
+PmSender = grabmiddle(Data,"4\'c0\'80","\'c0\'80")\par
+Dim Pmtext as string\par
+Pmtext = grabmiddle(Data,"\'c0\'80666\'c0\'80","\'c0\'80")\par
+now lets put are pmsender and text in that Recvpm textbox i told you to make \par
+\par
+Recvpm.text = Recvpm.text & PmSender & " :  " & Pmtext & vbcrlf\par
+\cf7 now that we got are pmsender name and the pm text now we needa make sumthing so this dont show on all the recved packets . we only want to only make this work on a pm packet so lets figure that out . now . if you read this tutorial then you must know by now the command byte of the packet. so see are hex raw recv packet we got for this . well do this \cf4\par
+if mid(Data,12,1) = hextoascii("06") then\par
+end if \par
+\cf7 now same but if you got a buffer\cf4\par
+\par
+if mid(Buffer,12,1) = hextoascii("06") then\par
+end if\par
+\par
+\par
+\cf7 now that is under winsock.getdata getdata make it like this \cf4\par
+\par
+if mid(Data,12,1) = hextoascii("06") then\par
+\cf5 Dim PmSender as string\par
+PmSender = grabmiddle(Data,"4\'c0\'80","\'c0\'80")\par
+Dim Pmtext as string\par
+Pmtext = grabmiddle(Data,"\'c0\'80666\'c0\'80","\'c0\'80")\par
+Recvpm.text = Recvpm.text & PmSender & " :  " & Pmtext & vbcrlf\cf4\par
+end if \par
+\cf7 now same but if you got a buffer\cf4\par
+\par
+if mid(Buffer,12,1) = hextoascii("06") then\par
+\cf5 Dim PmSender as string\par
+PmSender = grabmiddle(Data,"4\'c0\'80","\'c0\'80")\par
+Dim Pmtext as string\par
+Pmtext = grabmiddle(Data,"\'c0\'80666\'c0\'80","\'c0\'80")\par
+Recvpm.text = Recvpm.text & PmSender & " :  " & Pmtext & vbcrlf\cf4\par
+end if\par
+\par
+\par
+\par
+\par
+\cf7 now volia . you should understand this if no delete vb :))\par
+\par
+\par
+you should always remember this\cf4\par
+if mid(Buffer,12,1) = hextoascii("06") then\par
+\cf5\par
+\cf4 end if\par
+\cf7\par
+now lets do it a diffrent way lets do it this time using spliters\par
+\cf4\par
+\par
+\par
+\cf8 4..killalbyte..1..killalbyte..5..internetprogramer..14..cool..97..1..63..;0..64..0..1002..1..\cf4\par
+\par
+\par
+Dim pmsenderspliter1 as string\par
+Dim pmtextspliter2 as string\par
+pmsenderspliter1  = split(data,"14\'c0\'80")(1)\par
+pmtextspliter2 = split(data,"4\'c0\'80")(1)\par
+Recvpm.text = Recvpm.text & pmsenderspliter1  & " :  " & pmtextspliter2 & vbcrlf\par
+\par
+\cf7 so it ends up\par
+\cf4\par
+if mid(Buffer,12,1) = hextoascii("06") then\par
+\cf5 Dim pmsenderspliter1 as string\par
+Dim pmtextspliter2 as string\par
+pmsenderspliter1  = split(data,"14\'c0\'80")(1)\par
+pmtextspliter2 = split(data,"4\'c0\'80")(1)\par
+Recvpm.text = Recvpm.text & pmsenderspliter1  & " :  " & pmtextspliter2 & vbcrlf\par
+\cf4 end if\par
+\par
+\par
+\par
+\par
+\par
+\par
+\par
+ok simple examples\par
+just incase\par
+\par
+\par
+\par
+\par
+\par
+\par
+\par
+\par
+\par
+\cf7 split example and put result in textbox2\cf4\par
+text = "hello,goodbye,welcome"\par
+Dim spliter as variant\par
+spliter = split(text,",")\par
+\cf7 now to make lets say goodbye is the word we want and put it in textbox2\cf4\par
+textbox2.text = spliter(1)\par
+\par
+hello = 0\par
+goodbye=1\par
+welcome=2\par
+\cf7 spliters always start at 0 ALL THE TIME\par
+\cf4\par
+\cf7 instr example\par
+\par
+instr is used for finding the start of the word or letter your looking for  ina string\cf4\par
+\par
+text = "hello,goodbye,welcome"\par
+\cf7 ok we wanna get the posistion for the frist ,\par
+\par
+dim result as string\cf4\par
+result = instr(1,text,",")\par
+\cf7\par
+result will be 6\cf4\par
+\cf7 ok now . to the mid example where we use instr more\cf4\par
+\cf7\par
+\par
+Mid example\cf4\par
+\par
+text = "hello,goodbye,welcome"\par
+\par
+\par
+ok lets use this\par
+from are instr example\par
+\par
+dim result as string\par
+result = instr(1,text,",")\par
+now say we wanna get the word hello using spliters\par
+this is how \par
+Dim result1 as string\par
+result1 = mid(text,1,result - 1)\par
+then volia result1 is now hello\par
+\par
+\par
+now lets say we want the word goodbye\par
+\par
+seems like it will be a bytch\par
+well there really is not much diffrence\par
+\par
+dim result as string\par
+result = instr(1,text,",")\par
+Dim result1 as string\par
+result1 = mid(text,result + 1)\par
+\cf7 result1 now becomes goodbye now we basicly do the same thing over again\cf4\par
+dim result2 as string\par
+result2 = instr(1,text,",")\par
+Dim result3 as string\par
+result3 = mid(result1,1,result2 - 1)\par
+then volia result3 is now goodbye\par
+\par
+\par
+\par
+\par
+\par
+\cf7 there ya go . now if they dont help ya go pick up a hobby like knittin me a sweater\par
+\par
+\par
+\cf8\par
+\pard\qc\cf7 So this is my Tutorial . i might update it ina week or 2 . or so maybe cuz this is quite good so far might not need any other updates,,,, so i hope this thought you at least sumthing about packets and packet spliting . it should of . \par
+\par
+now that i am the only one that released this kind of tutorial that goes in depth fuck yall programmers and bow to the master ahah! bytchs!\par
+\par
+PEACE\~\~\~\~\~\~\~\~                 \par
+                       Eric\par
+}
+ 
